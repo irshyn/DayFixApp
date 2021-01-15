@@ -12,6 +12,7 @@ class App extends Component {
     super();
     this.state = {
       dayFixes: [],
+      isActive:false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -29,7 +30,9 @@ class App extends Component {
     })
         .then(response => response.json())
         .then(() => {
-            //displaySuccessMessage();
+          this.setState({
+            isActive:true
+          });
         })
         .catch(error => console.error('Unable to post this tweet.', error));
 }
@@ -43,7 +46,8 @@ class App extends Component {
         var removeIndex = tempArray.map(item => item.id).indexOf(id);
         if (removeIndex !== -1) tempArray.splice(removeIndex, 1);
         this.setState({
-          dayFixes: tempArray
+          dayFixes: tempArray,
+          isActive:false
         });
       })
       .catch(error => console.error('Unable to delete item.', error));    
@@ -65,7 +69,8 @@ class App extends Component {
         let dayfixes = this.state.dayFixes;
         dayfixes.push(data);
         this.setState({
-          dayFixes: dayfixes
+          dayFixes: dayfixes,
+          isActive:false
         });
       })
     .catch(error => console.error('Unable to add item.', error));   
@@ -76,7 +81,8 @@ class App extends Component {
       .then(response => response.json())
       .then(result => {        
         this.setState({
-          dayFixes: result
+          dayFixes: result,
+          isActive:false
         });
       });
   }
@@ -90,7 +96,11 @@ class App extends Component {
         <form onSubmit={this.handleSubmit}>
           <input type="submit" value="Brighten Your Day" className="btn btn-primary btn-lg" />
         </form>
-        <p id="successMessage">The tweet has been successfully posted. To see it, click <Router><Link to = 'https://twitter.com/CatAndJoke' target="_blank">here</Link></Router>.</p>
+        {this.state.isActive ? 
+          <p>The tweet has been successfully posted. To see it, click <a target='_blank' rel='noreferrer' href='https://twitter.com/CatAndJoke'>here</a>.</p> 
+          : 
+          null }
+        
         <hr /> 
         <DayFixes 
           dayfixes={dayfixes}
