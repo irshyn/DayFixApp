@@ -7,6 +7,27 @@
     <link rel="stylesheet" href="/css/Site.css">
 </head>
 <body>
+    <button id="btnRegister" onclick="showRegisterForm()">Register</button>
+    <button id="btnLogin" onclick="showLoginForm()">Login</button>
+
+    <form action="javascript:void(0);" method="POST" style="display:none" id="registerForm" name="registerForm" onsubmit="register()">
+        <label>User Name:</label>
+        <input type="text" name="username" /><br><br>
+        <label>Password:</label>
+        <input type="text" name="password" /><br><br>
+        <label>Email Address:</label>
+        <input type="text" name="emailaddress" /><br><br>
+        <input type="submit" value="Register" class="btn btn-success btn-sm">
+    </form>
+
+    <form action="javascript:void(0);" method="GET" style="display:none" id="loginForm" name="loginForm" onsubmit="login()">
+        <label>User Name:</label>
+        <input type="text" name="username" /><br><br>
+        <label>Password:</label>
+        <input type="text" name="password" /><br><br>
+        <input type="submit" value="Login" class="btn btn-success btn-sm">
+    </form>
+
     <h1>Day Fixes</h1>
     <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
         <input type="submit" value="Add Day Fix" class="btn btn-primary btn-lg">
@@ -38,6 +59,8 @@
         </div>
     </div>
     <p id="successMessage" style="display:none;color:red;font-size:larger;">The tweet has been successfully posted. To see it, click <a href="https://twitter.com/catandjoke" target="_blank">here</a>.</p>
+
+    <button onclick="sendRequest();">Send Request</button>
 
     <script src="js/site.js" asp-append-version="true"></script>
     <script type="text/javascript">getItems();</script>

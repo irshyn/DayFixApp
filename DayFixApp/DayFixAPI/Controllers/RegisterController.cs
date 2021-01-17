@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DayFixAPI.Models;
+using DayFixAPI.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace DayFixAPI.Controllers
 {
@@ -12,10 +14,12 @@ namespace DayFixAPI.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
+        private IConfiguration _config;
         private readonly DayFixContext _context;
 
-        public RegisterController(DayFixContext context)
+        public RegisterController(IConfiguration config, DayFixContext context)
         {
+            _config = config;
             _context = context;
 
             if (!_context.RegisteredUsers.Any(ru => ru.UserName=="admin"))
@@ -41,7 +45,8 @@ namespace DayFixAPI.Controllers
             _context.RegisteredUsers.Add(newuser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(RegisterUser), newuser);
+            var tokenStr = JWTService.GenerateToken(_config, newuser);
+            return Ok(new { token = tokenStr });
         }
     }
 }

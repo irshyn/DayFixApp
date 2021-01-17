@@ -1,18 +1,20 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import '../css/App.css';
-import { BrowserRouter as Router, Link } from 'react-router-dom';
-import { Component } from 'react';
+import { Component, Fragment } from 'react';
+import AppHeader from './AppHeader';
 import DayFixes from './DayFixes';
-
-const uri = 'https://localhost:44338/api/v1/DayFix';
+import {BASE_API_URL, JWT_KEY} from '../constants';
 
 class App extends Component { 
 
   constructor() {
     super();
+    var token = localStorage.getItem(JWT_KEY);
     this.state = {
       dayFixes: [],
-      isActive:false
+      onPost:false, // determines whether "The tweet has been successfully posted" message will be displayed
+      postedSuccessfully:false, // whether the twit was posted successfully
+      isAuthenticated:token != null
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -21,24 +23,40 @@ class App extends Component {
   }
 
   postToTwitter(fixId) {
-    fetch(`${uri}/TwitterPost/${fixId}`, {
+    var jtw = localStorage.getItem(JWT_KEY);
+
+    fetch(`${BASE_API_URL}/DayFix/TwitterPost/${fixId}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jtw}`
         }
     })
-        .then(response => response.json())
-        .then(() => {
+    .then(response => {
+      if (response.status === 200) {
+          console.log('Authorized');
           this.setState({
-            isActive:true
+            postedSuccessfully:true
           });
-        })
-        .catch(error => console.error('Unable to post this tweet.', error));
-}
+      }
+      else if (response.status === 401) {
+          console.log('Unauthorized');
+          this.setState({
+            postedSuccessfully:false
+          });
+      }
+    })
+    .then(() => {
+      this.setState({
+        onPost:true
+      });
+    })
+    .catch(error => console.error('Unable to post this tweet.', error));
+  }
 
   deleteItem(id) {
-    fetch(`${uri}/${id}`, {
+    fetch(`${BASE_API_URL}/DayFix/${id}`, {
       method: 'DELETE'
     })
       .then(() => {
@@ -47,17 +65,16 @@ class App extends Component {
         if (removeIndex !== -1) tempArray.splice(removeIndex, 1);
         this.setState({
           dayFixes: tempArray,
-          isActive:false
+          onPost:false
         });
       })
       .catch(error => console.error('Unable to delete item.', error));    
-  }
-  
+  }  
 
   handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch(uri, {
+    fetch(BASE_API_URL + '/DayFix', {
       method: 'POST',
       headers: {
           'Accept': 'application/json',
@@ -70,19 +87,19 @@ class App extends Component {
         dayfixes.push(data);
         this.setState({
           dayFixes: dayfixes,
-          isActive:false
+          onPost:false
         });
       })
     .catch(error => console.error('Unable to add item.', error));   
   }
 
-  componentDidMount() {
-    fetch(uri)
+  componentDidMount() {    
+    fetch(BASE_API_URL + '/DayFix')
       .then(response => response.json())
       .then(result => {        
         this.setState({
           dayFixes: result,
-          isActive:false
+          onPost:false
         });
       });
   }
@@ -90,24 +107,28 @@ class App extends Component {
   render () {
     let dayfixes = this.state.dayFixes;
     return (      
-      <main>
-        <h1>Day Fix</h1>
-        <h4>To make your day better, click on the button below and get another random cat picture along with a really corny joke.</h4>
-        <form onSubmit={this.handleSubmit}>
-          <input type="submit" value="Brighten Your Day" className="btn btn-primary btn-lg" />
-        </form>
-        {this.state.isActive ? 
-          <p>The tweet has been successfully posted. To see it, click <a target='_blank' rel='noreferrer' href='https://twitter.com/CatAndJoke'>here</a>.</p> 
-          : 
-          null }
-        
-        <hr /> 
-        <DayFixes 
-          dayfixes={dayfixes}
-          deleteItem={this.deleteItem}
-          postToTwitter={this.postToTwitter}
-        ></DayFixes>
-      </main>
+      <Fragment>
+        <AppHeader isLoggedIn={this.state.isAuthenticated} />
+        <main>
+          <h1>Day Fix</h1>
+          <h4>To make your day better, click on the button below and get another random cat picture along with a really corny joke.</h4>
+          <form onSubmit={this.handleSubmit}>
+            <input type="submit" value="Brighten Your Day" className="btn btn-primary btn-lg" />
+          </form>
+          {this.state.onPost && this.state.postedSuccessfully ? 
+            <p>The tweet has been successfully posted. To see it, click <a target='_blank' rel='noreferrer' href='https://twitter.com/CatAndJoke'>here</a>.</p> 
+            : this.state.onPost && !this.state.postedSuccessfully ?
+            <p style={{color: "red"}}>Only logged-in users are allowed to post to Twitter.</p>
+            : null }
+          
+          <hr /> 
+          <DayFixes 
+            dayfixes={dayfixes}
+            deleteItem={this.deleteItem}
+            postToTwitter={this.postToTwitter}
+          ></DayFixes>
+        </main>
+      </Fragment>
     );
   }  
 }

@@ -1,8 +1,90 @@
 ﻿// <snippet_SiteJs>
 const uri = 'api/v1/DayFix';
 let dayfixes = [];
+let jtw = '';
 
-// To gat all dayfixes
+// to register the user
+function register() {
+    var newUser = {
+        username: document.forms["registerForm"]["username"].value,
+        password: document.forms["registerForm"]["password"].value,
+        emailaddress: document.forms["registerForm"]["emailaddress"].value
+    };
+
+    fetch('https://localhost:44338/api/v1/register', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newUser)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        jtw = data.token;
+        localStorage.setItem('dayfix_jtw', jtw);
+        document.getElementById("registerForm").style.display = "none";
+    })
+    .catch(error => console.error('Unable to register.', error));
+}
+
+// to register the user
+function login() {
+    var newUser = {
+        username: document.forms["loginForm"]["username"].value,
+        password: document.forms["loginForm"]["password"].value,
+        emailaddress: ''
+    };
+
+    fetch('https://localhost:44338/api/v1/login', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newUser)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
+    .then(function (data) {
+        jtw = data.token;
+        localStorage.setItem('dayfix_jtw', jtw);
+        document.getElementById("loginForm").style.display = "none";
+    })
+    .catch(error => console.error('Unable to register.', error));
+}
+
+function sendRequest() {
+    fetch(`${uri}/GetValue`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jtw}`
+        }
+    })
+        .then(function (response) {
+            if (response.status === 200) {
+                console.log('authorized');
+            }
+            else if (response.status === 401) {
+                console.log('Unauthorized');
+            }
+        })
+        .catch(function (error) {
+            console.log('Error caught');
+        });
+}
+
+// To get all dayfixes
 function getItems() {
     fetch(uri)
         .then(response => response.json())
@@ -78,6 +160,7 @@ function _displayItems(data) {
     });
 
     dayfixes = data;
+    jtw = localStorage.getItem('dayfix_jtw');
 }
 
 // to display the selected item with image rendered
@@ -110,4 +193,12 @@ function postToTwitter() {
 
 function displaySuccessMessage() {
     document.getElementById("successMessage").style.display = "block";
+}
+
+function showRegisterForm() {
+    document.getElementById("registerForm").style.display = "block";
+}
+
+function showLoginForm() {
+    document.getElementById("loginForm").style.display = "block";
 }

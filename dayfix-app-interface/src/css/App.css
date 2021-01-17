@@ -1,8 +1,11 @@
 body {
-  padding: 50px;
   background: #313d4b;
   color: white;
   text-align:center;
+}
+
+main {
+  padding: 2em;
 }
 
 hr {
@@ -14,8 +17,48 @@ h1 {
   margin-bottom:1em;
 }
 
+.navbar-style {
+  background-color: #1b2838;
+}
+
+.navbar-brand {
+  padding: 0;
+  margin: 0;
+}
+
+nav a {
+  color: white;
+}
+
+nav a:hover {
+  color: lightgray;
+}
+
+nav img {
+  margin-right: 1em;
+}
+
+.nav-item {
+  display: inline;
+}
+
 input[type=submit] {
   margin: 1.5em 0;
+}
+
+.modal-content {
+  color:#1b2838;
+}
+
+.navbar-button {
+  background-color: transparent;
+  border:none;
+}
+
+.navbar-button:focus {
+  background-color: transparent;
+  border:none;
+  box-shadow: none;
 }
 
 #successMessage {

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using DayFixAPI.Models;
 using DayFixAPI.Services;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DayFixAPI.Controllers
 {
@@ -95,6 +96,7 @@ namespace DayFixAPI.Controllers
 
         #region post dayfix to twitter
         // POST: api/v1/DayFix/TwitterPost/5
+        [Authorize]
         [HttpPost("TwitterPost/{id}")]
         public async Task<ActionResult<DayFix>> PostDayFixToTwitter(long id)
         {
@@ -123,5 +125,12 @@ namespace DayFixAPI.Controllers
             }
         }
         #endregion
+
+        [Authorize]
+        [HttpGet("GetValue")]
+        public ActionResult<IEnumerable<string>> Get()
+        {
+            return new string[] { "Value1", "Value2", "Value3" };
+        }
     }
 }
