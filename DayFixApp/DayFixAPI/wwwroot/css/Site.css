@@ -1,40 +1,114 @@
 ﻿body {
-    padding: 50px;
+    background: #313d4b;
+    color: white;
+    text-align: center;
 }
 
-/* Set padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+main {
+    padding: 2em 5em;
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
+hr {
+    width: 75%;
+    border-color: white;
+}
+
+h1 {
+    margin-bottom: 1em;
+}
+
+
+.navbar-style {
+    background-color: #1b2838;
+}
+
+.navbar-brand {
+    padding: 0;
+    margin: 0;
+}
+
+.navbar-brand {
+    color: white;
+}
+
+
+nav img {
+    margin-right: 1em;
+}
+
+.nav-item {
+    display: inline;
 }
 
 input[type=submit] {
-    margin: 25px 0;
+    margin: 1.5em 0;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+.modal-content {
+    color: #1b2838;
 }
 
-h2 {
+.navbar-button {
+    color: white;
+    /*background-color: transparent;
+    border: none;*/
+}
+
+.navbar-button:hover {
+    color:lightgray;
+}
+
+.navbar-button:focus {
+    color: white;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#successMessage {
+    display: none;
+    font-size: larger;
+}
+
+.dayfix-tile {
+    background: white;
+    margin: 20px;
+    padding-top: 10px;
+    width: 353px;
+    max-width: 353px;
+    border: solid black 4px;
+    border-radius: 0.5rem;
+    float: left;
+}
+
+.img-container {
+    height: 350px;
+    width: 347px;
+    overflow: hidden;
+    position: relative;
     text-align: center;
-    margin-bottom:25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-table {
-    width:60%;
+.cat-pic {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    width: auto;
 }
 
-tr {
-    height:35px;
+.joke-text {
+    width: 353px;
+    height: 85px;
+    padding: 10px;
+    color: black;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.tile-button {
+    text-align: center !important;
+    margin-bottom: 10px !important;
 }

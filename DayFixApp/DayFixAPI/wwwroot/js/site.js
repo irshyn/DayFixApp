@@ -1,14 +1,26 @@
 ﻿// <snippet_SiteJs>
 const uri = 'api/v1/DayFix';
 let dayfixes = [];
+const DAYFIX_KEY = 'dayfix_jtw';
 let jtw = '';
+const TWIT_POSTED = 'The tweet has been successfully posted. To see it, click <a target="_blank" href="https://twitter.com/CatAndJoke">here</a>.';
+const CANT_TWIT = 'Only logged-in users are allowed to post to Twitter.';
 
 // to register the user
 function register() {
+    const name = document.getElementById("usernameRegister").value;
+    const pswd = document.getElementById("passwordRegister").value;
+    const email = document.getElementById("emailAddressRegister").value;
+
+    if (!name || !pswd || !email) {
+        document.getElementById("registerValidationError").innerHTML = "All fields are required.";
+        return;
+    }
+
     var newUser = {
-        username: document.forms["registerForm"]["username"].value,
-        password: document.forms["registerForm"]["password"].value,
-        emailaddress: document.forms["registerForm"]["emailaddress"].value
+        username: document.getElementById("usernameRegister").value,
+        password: document.getElementById("passwordRegister").value,
+        emailaddress: document.getElementById("emailAddressRegister").value
     };
 
     fetch('https://localhost:44338/api/v1/register', {
@@ -21,23 +33,35 @@ function register() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error("HTTP error " + response.status);
+            response.text().then(function (text) {
+                document.getElementById("registerValidationError").innerHTML = text;
+                throw new Error("HTTP error " + response.status);
+            });
         }
-        return response.json();
+        else {
+            return response.json();
+        }        
     })
     .then(function(data) {
         jtw = data.token;
-        localStorage.setItem('dayfix_jtw', jtw);
-        document.getElementById("registerForm").style.display = "none";
+        localStorage.setItem(DAYFIX_KEY, jtw);
+        _displayAuthButtons(true);
+        document.getElementById("usernameRegister").value = '';
+        document.getElementById("passwordRegister").value = '';
+        document.getElementById("emailAddressRegister").value = '';
+        $('#registerModal').modal('hide');
     })
-    .catch(error => console.error('Unable to register.', error));
+    .catch(error => {
+        console.error('Unable to register.', error);
+        
+    });
 }
 
-// to register the user
+// to log in
 function login() {
-    var newUser = {
-        username: document.forms["loginForm"]["username"].value,
-        password: document.forms["loginForm"]["password"].value,
+    var user = {
+        username: document.getElementById("usernameLogIn").value,
+        password: document.getElementById("passwordLogIn").value,
         emailaddress: ''
     };
 
@@ -47,7 +71,7 @@ function login() {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newUser)
+        body: JSON.stringify(user)
     })
     .then(response => {
         if (!response.ok) {
@@ -57,35 +81,24 @@ function login() {
     })
     .then(function (data) {
         jtw = data.token;
-        localStorage.setItem('dayfix_jtw', jtw);
-        document.getElementById("loginForm").style.display = "none";
+        localStorage.setItem(DAYFIX_KEY, jtw);
+        _displayAuthButtons(true);
+        document.getElementById("usernameLogIn").value = '';
+        document.getElementById("passwordLogIn").value = '';
+        $('#loginModal').modal('hide');
     })
-    .catch(error => console.error('Unable to register.', error));
+    .catch(error => console.error('Unable to login.', error));
 }
 
-function sendRequest() {
-    fetch(`${uri}/GetValue`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jtw}`
-        }
-    })
-        .then(function (response) {
-            if (response.status === 200) {
-                console.log('authorized');
-            }
-            else if (response.status === 401) {
-                console.log('Unauthorized');
-            }
-        })
-        .catch(function (error) {
-            console.log('Error caught');
-        });
+// to log out
+function logout() {
+    localStorage.removeItem(DAYFIX_KEY);
+    _displayAuthButtons(false);
 }
 
-// To get all dayfixes
+// to get all dayfixes
 function getItems() {
+    _renderNavbar();
     fetch(uri)
         .then(response => response.json())
         .then(data => _displayItems(data))
@@ -108,7 +121,7 @@ function addItem() {
         .catch(error => console.error('Unable to add item.', error));
 }
 
-//to delete a specific item on the list
+// to delete a specific item on the list
 function deleteItem(id) {
     fetch(`${uri}/${id}`, {
         method: 'DELETE'
@@ -118,87 +131,81 @@ function deleteItem(id) {
 }
 
 
-function _displayCount(itemCount) {
-    const name = (itemCount === 1) ? 'dayfix' : 'dayfixes';
+// will determine a valid token can be retrieved, and displays correspondent buttons in the nav bar
+function _renderNavbar() {
+    jtw = localStorage.getItem(DAYFIX_KEY);
+    _displayAuthButtons(jtw != null && !tokenExpired(jtw));
+}
 
-    document.getElementById('counter').innerText = `You have ${itemCount} ${name} in your collection`;
+// will  display "Register" and "Log In" or "Log Out" buttons depending on whether a valid token is found
+function _displayAuthButtons(isLoggedIn) {
+    const navBody = document.getElementById('authentication_bar');
+    navBody.innerHTML = '';
+
+    if (isLoggedIn) {
+        navBody.innerHTML = '<button type="button" class="btn navbar-button navbar-btn" onclick="logout();">Log Out</button>';
+    }
+    else {
+        navBody.innerHTML = '<button type="button" class="btn navbar-button navbar-btn" data-toggle="modal" data-target="#registerModal">Register</button><button type="button" class="btn navbar-button navbar-btn" data-toggle="modal" data-target="#loginModal">Log In</button>';
+    }
 }
 
 // display all dayfix items
 function _displayItems(data) {
-    const tBody = document.getElementById('dayfixes');
-    tBody.innerHTML = '';
-
-    _displayCount(data.length);
-
-    const button = document.createElement('button');
+    const dayFixesBody = document.getElementById('dayFixes');
+    dayFixesBody.innerHTML = '';
+    var html = '';
 
     data.forEach(item => {
-        let deleteButton = button.cloneNode(false);
-        deleteButton.innerText = 'Delete';
-        deleteButton.setAttribute('onclick', `deleteItem(${item.id})`);
-
-        let editButton = button.cloneNode(false);
-        editButton.innerText = 'View';
-        editButton.setAttribute('onclick', `displayViewForm(${item.id})`);
-
-        let tr = tBody.insertRow();
-
-        let td1 = tr.insertCell(0);
-        let textNode1 = document.createTextNode(item.catImage);
-        td1.appendChild(textNode1);
-
-        let td2 = tr.insertCell(1);
-        let textNode2 = document.createTextNode(item.dadJoke);
-        td2.appendChild(textNode2);
-
-        let td3 = tr.insertCell(2);
-        td3.appendChild(editButton);
-
-        let td4 = tr.insertCell(3);
-        td4.appendChild(deleteButton);
+        html += '<div class="dayfix-tile"><div class="img-container"><img class="cat-pic" src="' + item.catImage + '" alt="cat pic" /></div>';
+        html += '<div class="joke-text">' + item.dadJoke + '</div><div class="row"><div class="col-md-6 tile-button">';
+        html += '<button class="btn btn-sm btn-success" onclick="postToTwitter(' + item.id + ')">Post to Twitter</button></div>';
+        html += '<div class="col-md-6 tile-button"><button class="btn btn-sm btn-danger" onclick="deleteItem(' + item.id + ')">Remove</button></div></div></div>';
     });
 
-    dayfixes = data;
-    jtw = localStorage.getItem('dayfix_jtw');
-}
-
-// to display the selected item with image rendered
-function displayViewForm(id) {
-    const item = dayfixes.find(item => item.id === id);
-    document.getElementById("successMessage").style.display = "none";
-    document.getElementById("fixId").value = id;
-    document.getElementById('catimg').innerHTML = '<img src="' + item.catImage + '" alt="Funny Cat" width=200>';
-    document.getElementById('joke').innerHTML = '<span style="font-size:large">' + item.dadJoke + '</span>';
-    document.getElementById('viewDayfix').style.display = 'block';
-    document.getElementById('viewDayfix').style.margin = '10px 20px';
+    dayFixesBody.innerHTML = html;
+    dayfixes = data;    
 }
 
 // to send the post to twitter
-function postToTwitter() {
-    var fixId = document.getElementById("fixId").value;
+function postToTwitter(fixId) {
+    var jtw = localStorage.getItem(DAYFIX_KEY);
     fetch(`${uri}/TwitterPost/${fixId}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jtw}`
         }
     })
-        .then(response => response.json())
-        .then(() => {
-            displaySuccessMessage();
-        })
-        .catch(error => console.error('Unable to post this tweet.', error));
+    .then(response => {
+        if (response.status === 200) {
+            console.log('Authorized');
+            displayMessage(TWIT_POSTED);
+        }
+        else if (response.status === 401) {
+            console.log('Unauthorized');
+            displayMessage(CANT_TWIT);
+        }
+    })
+        .catch(function (error) {
+            console.log('Error caught');
+            displayMessage(error);
+        });
 }
 
-function displaySuccessMessage() {
-    document.getElementById("successMessage").style.display = "block";
+// to display a message after a twit was posted / failed to be posted
+function displayMessage(message) {
+    var errorMessage = document.getElementById("resultMessage");
+    errorMessage.style.display = "block";
+    errorMessage.innerHTML = message;
 }
 
-function showRegisterForm() {
-    document.getElementById("registerForm").style.display = "block";
-}
-
-function showLoginForm() {
-    document.getElementById("loginForm").style.display = "block";
+// to determine whether a given token has expired
+function tokenExpired(jtw) {
+    const jwt_split = jtw.split('.');
+    let content = atob(jwt_split[1]);
+    const token = JSON.parse(content);
+    const expDateTime = token.exp;
+    return expDateTime < Date.now().toString().substring(0, 10);
 }

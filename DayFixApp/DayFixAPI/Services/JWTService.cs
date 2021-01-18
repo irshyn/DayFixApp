@@ -26,7 +26,7 @@ namespace DayFixAPI.Services
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Issuer"],
                 claims,
-                expires: DateTime.Now.AddMinutes(10),
+                expires: DateTime.Now.AddMinutes(90),
                 signingCredentials: credentials
                 );
 

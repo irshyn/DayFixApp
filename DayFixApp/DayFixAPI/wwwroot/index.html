@@ -5,63 +5,98 @@
     <title>Day Fixes</title>
     <link rel="stylesheet" href="/css/bootstrap.css">
     <link rel="stylesheet" href="/css/Site.css">
+
 </head>
 <body>
-    <button id="btnRegister" onclick="showRegisterForm()">Register</button>
-    <button id="btnLogin" onclick="showLoginForm()">Login</button>
+    <nav class="navbar navbar-inverse navbar-fixed-top navbar-style">
+        <a class="navbar-brand" href="#"><img src="/images/avatar.png" width="38" class="d-inline-block" alt="Cat Pic" /> Home</a>
 
-    <form action="javascript:void(0);" method="POST" style="display:none" id="registerForm" name="registerForm" onsubmit="register()">
-        <label>User Name:</label>
-        <input type="text" name="username" /><br><br>
-        <label>Password:</label>
-        <input type="text" name="password" /><br><br>
-        <label>Email Address:</label>
-        <input type="text" name="emailaddress" /><br><br>
-        <input type="submit" value="Register" class="btn btn-success btn-sm">
-    </form>
-
-    <form action="javascript:void(0);" method="GET" style="display:none" id="loginForm" name="loginForm" onsubmit="login()">
-        <label>User Name:</label>
-        <input type="text" name="username" /><br><br>
-        <label>Password:</label>
-        <input type="text" name="password" /><br><br>
-        <input type="submit" value="Login" class="btn btn-success btn-sm">
-    </form>
-
-    <h1>Day Fixes</h1>
-    <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
-        <input type="submit" value="Add Day Fix" class="btn btn-primary btn-lg">
-    </form>
-    <p id="counter"></p>
-
-    <table>
-        <tr>
-            <th>Cat Pic</th>
-            <th>Joke</th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tbody id="dayfixes"></tbody>
-    </table>
-
-    <div class="row" id="viewDayfix" style="display:none;width:1000px;">
-        <input type="hidden" id="fixId" value="" />
-        <div class="col-md-4">
-            <h3>Cat of the Day</h3>
-            <p id="catimg"></p>
+        <div class="navbar-nav ml-auto">
+            <div class="nav-item" id="authentication_bar"></div>
         </div>
-        <div class="col-md-4">
-            <h3>Dad Joke of the Day</h3>
-            <p id="joke"></p>
-        </div>
-        <div class="col-md-4">
-            <button class="btn btn-success btn-lg" style="margin-top:50px;" onclick="postToTwitter()">Post to Twitter</button>
-        </div>
-    </div>
-    <p id="successMessage" style="display:none;color:red;font-size:larger;">The tweet has been successfully posted. To see it, click <a href="https://twitter.com/catandjoke" target="_blank">here</a>.</p>
+    </nav>
 
-    <button onclick="sendRequest();">Send Request</button>
+    <main>
+        <h1>Day Fix</h1>
 
+        <h4>To make your day better, click on the button below and get a random cat picture with a really corny joke.</h4>
+
+        <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
+            <input type="submit" value="Brighten Your Day" class="btn btn-primary btn-lg">
+        </form>
+        <p id="resultMessage" style="display:none;color:red;font-size:larger;"></p>
+
+        <hr />
+
+        <div class="row" id="dayFixes"></div>
+
+        <!--Log In Modal-->
+        <div class="modal fade" id="loginModal" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="loginModalTitle">Log In</h4>
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" style="text-align: left;">
+                            <div class="form-group">
+                                <label for="username" class="modal-label">User Name&nbsp;<span style="color:red;font-weight:bolder"><sup>&#8902;</sup></span></label>
+                                <input type="text" class="form-control" id="usernameLogIn" autocomplete="off" />
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="modal-label">Password&nbsp;<span style="color:red;font-weight:bolder"><sup>&#8902;</sup></span></label>
+                                <input type="password" class="form-control" id="passwordLogIn" autocomplete="off" />
+                            </div>
+                        </form>
+                        <span id="logInValidationError" class="modal-error" style="color:red;"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btnSubmit" onclick="login();">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Register Modal-->
+        <div class="modal fade" id="registerModal" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="registerModalTitle">Register</h4>
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" style="text-align: left;">
+                            <div class="form-group">
+                                <label for="username" class="modal-label">User Name&nbsp;<span style="color:red;font-weight:bolder"><sup>&#8902;</sup></span></label>
+                                <input type="text" class="form-control" id="usernameRegister" autocomplete="off" />
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="modal-label">Password&nbsp;<span style="color:red;font-weight:bolder"><sup>&#8902;</sup></span></label>
+                                <input type="password" class="form-control" id="passwordRegister" autocomplete="off" />
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="modal-label">Email Address&nbsp;<span style="color:red;font-weight:bolder"><sup>&#8902;</sup></span></label>
+                                <input type="text" class="form-control" id="emailAddressRegister" autocomplete="off" />
+                            </div>
+                        </form>
+                        <span id="registerValidationError" class="modal-error" style="color:red;"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btnSubmit" onclick="register();">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <script src="js/jquery.min.js" asp-append-version="true"></script>
+    <script src="js/popper.min.js" asp-append-version="true"></script>
+    <script src="js/bootstrap.min.js" asp-append-version="true"></script>
     <script src="js/site.js" asp-append-version="true"></script>
     <script type="text/javascript">getItems();</script>
 </body>

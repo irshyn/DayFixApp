@@ -111,7 +111,7 @@ class App extends Component {
         <AppHeader isLoggedIn={this.state.isAuthenticated} />
         <main>
           <h1>Day Fix</h1>
-          <h4>To make your day better, click on the button below and get another random cat picture along with a really corny joke.</h4>
+          <h4>To make your day better, click on the button below and get a random cat picture with a really corny joke.</h4>
           <form onSubmit={this.handleSubmit}>
             <input type="submit" value="Brighten Your Day" className="btn btn-primary btn-lg" />
           </form>
