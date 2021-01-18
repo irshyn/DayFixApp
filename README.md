@@ -7,7 +7,7 @@ ASP.NET-based RESTful Web API application with a separate React interface that a
 ASP.NET Core, C#, JavaScript, React, HTML, CSS
 
 ## App Screenshot
-<img src="https://imgur.com/kYEWkAT.gif" width="1200">
+<img src="https://imgur.com/kl0Mi3S.gif" width="1200">
 
 ## Features: 
 - registration and login
