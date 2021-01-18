@@ -105,6 +105,5 @@ input[type=submit] {
 }
 
 .tile-button {
-  text-align: center!important;
-  margin-bottom: 10px!important;
+  margin: 0 15px 15px 15px!important;
 }

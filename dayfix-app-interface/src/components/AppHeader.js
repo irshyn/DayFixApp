@@ -23,12 +23,14 @@ class AppHeader extends Component {
     }
 
     onAuthentication(isAuth) {
+        this.props.handleAuth(isAuth);
         this.setState({
             isAuthenticated: isAuth
         });
     }
 
     logout() {
+        this.props.handleAuth(false);
         localStorage.removeItem(JWT_KEY);
         this.setState({
             isAuthenticated: false

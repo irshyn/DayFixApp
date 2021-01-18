@@ -11,11 +11,11 @@ class DayFixes extends Component {
                         <div className="img-container"><img className="cat-pic" src={item.catImage} alt="cat pic" /></div >
                         <div className="joke-text">{item.dadJoke}</div>
                         <div className="row">
-                            <div className="col-md-6 tile-button">
-                                <button className="btn btn-sm btn-success" onClick={() => {this.props.postToTwitter(item.id)}}>Post to Twitter</button>
-                            </div>
-                            <div className="col-md-6 tile-button">
-                                <button className="btn btn-sm btn-danger" onClick={() => {this.props.deleteItem(item.id)}}>Remove</button>
+                            <div class="col text-center">
+                                {this.props.isAuth ?
+                                    <button className="btn btn-sm btn-success tile-button" onClick={() => {this.props.postToTwitter(item.id)}}>Post to Twitter</button> : null
+                                }
+                                <button className="btn btn-sm btn-danger tile-button" onClick={() => {this.props.deleteItem(item.id)}}>Remove</button>
                             </div>
                         </div>
                     </div>

@@ -18,6 +18,7 @@ class App extends Component {
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleAuthChange = this.handleAuthChange.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.postToTwitter = this.postToTwitter.bind(this);
   }
@@ -93,6 +94,11 @@ class App extends Component {
     .catch(error => console.error('Unable to add item.', error));   
   }
 
+  // to be passed as prop to AppHeader
+  handleAuthChange(val) {
+    this.setState({ isAuthenticated: val });
+  }
+
   componentDidMount() {    
     fetch(BASE_API_URL + '/DayFix')
       .then(response => response.json())
@@ -108,7 +114,7 @@ class App extends Component {
     let dayfixes = this.state.dayFixes;
     return (      
       <Fragment>
-        <AppHeader isLoggedIn={this.state.isAuthenticated} />
+        <AppHeader handleAuth={this.handleAuthChange} isLoggedIn={this.state.isAuthenticated} />
         <main>
           <h1>Day Fix</h1>
           <h4>To make your day better, click on the button below and get a random cat picture with a really corny joke.</h4>
@@ -124,6 +130,7 @@ class App extends Component {
           <hr /> 
           <DayFixes 
             dayfixes={dayfixes}
+            isAuth = {this.state.isAuthenticated}
             deleteItem={this.deleteItem}
             postToTwitter={this.postToTwitter}
           ></DayFixes>
