@@ -10,11 +10,20 @@ class App extends Component {
   constructor() {
     super();
     var token = localStorage.getItem(JWT_KEY);
+    let expDateTime;
+
+    if (token) {
+      const jwt_split = token.split('.');
+      let content = atob(jwt_split[1]);
+      const tokenData = JSON.parse(content);
+      expDateTime = tokenData.exp;
+    }    
+
     this.state = {
       dayFixes: [],
       onPost:false, // determines whether "The tweet has been successfully posted" message will be displayed
       postedSuccessfully:false, // whether the twit was posted successfully
-      isAuthenticated:token != null
+      isAuthenticated:token != null && expDateTime > Date.now().toString().substring(0, 10)
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
